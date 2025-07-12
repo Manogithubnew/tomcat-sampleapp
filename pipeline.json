@@ -1,7 +1,7 @@
 {
   "chart": "minikube-sampleapp",
   "version": "0.1.0",
-  "valuesFile": "tomcat-sampleapp/config/stg/values.yaml",
+  "valuesFile": "tomcat-sampleapp/tomcat-sampleapp/config/stg/values.yaml",
   "releaseName": "tomcat-sample",
   "namespace": "tomcat-sample"
 }
