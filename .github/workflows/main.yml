@@ -68,6 +68,9 @@ jobs:
             -n $NAMESPACE \
             -p '{"imagePullSecrets":[{"name":"image-registry-secret"}]}' || true
 
+      - name: Debug: Confirm values.yaml exists
+        run: ls -l $VALUES_FILE
+
       - name: Deploy using Helm
         working-directory: ${{ github.workspace }}
         run: |
