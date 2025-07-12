@@ -17,6 +17,20 @@ service:
 imagePullSecrets:
   - name: image-registry-secret
 
+livenessProbe:
+  httpGet:
+    path: /
+    port: 8080
+  initialDelaySeconds: 20
+  periodSeconds: 10
+
+readinessProbe:
+  httpGet:
+    path: /
+    port: 8080
+  initialDelaySeconds: 15
+  periodSeconds: 5
+
 resources:
   limits:
     cpu: 500m
@@ -24,17 +38,3 @@ resources:
   requests:
     cpu: 200m
     memory: 256Mi
-
-livenessProbe:
-  httpGet:
-    path: /
-    port: 8080
-  initialDelaySeconds: 15
-  periodSeconds: 10
-
-readinessProbe:
-  httpGet:
-    path: /
-    port: 8080
-  initialDelaySeconds: 10
-  periodSeconds: 5
