@@ -27,7 +27,7 @@ jobs:
       - name: Checkout Helm Chart
         uses: actions/checkout@v3
         with:
-          repository: your-org/minikube-sampleapp
+          repository: Manogithubnew/minikube-sampleapp
           path: helm-chart
           token: ${{ secrets.PAT_GITHUB }}
 
