@@ -66,7 +66,6 @@ jobs:
             -p '{"imagePullSecrets":[{"name":"image-registry-secret"}]}' || true
 
       - name: Deploy using Helm
-        working-directory: ${{ github.workspace }}
         run: |
           helm upgrade --install $RELEASE_NAME helm-chart \
             -n $NAMESPACE \
