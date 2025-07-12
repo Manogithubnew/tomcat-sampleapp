@@ -57,5 +57,5 @@ jobs:
       - name: Deploy with Helm
         run: |
           helm upgrade --install $RELEASE_NAME ./helm-chart \
-            -f config/stg/values.yaml \
+            -f $VALUES_FILE \
             --namespace $NAMESPACE --create-namespace
