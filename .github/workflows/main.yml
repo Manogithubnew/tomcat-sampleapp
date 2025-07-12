@@ -1,0 +1,54 @@
+jobs:
+  build-push-deploy:
+    runs-on: self-hosted
+    env:
+      IMAGE_NAME: 192.168.1.36:5000/tomcat-sample
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Login to Nexus Docker Registry
+        run: echo "${{ secrets.NEXUS_PASSWORD }}" | docker login 192.168.1.36:5000 -u ${{ secrets.NEXUS_USERNAME }} --password-stdin
+
+      - name: Build Image
+        run: docker build -t $IMAGE_NAME:latest .
+
+      - name: Push Image
+        run: docker push $IMAGE_NAME:latest
+
+      - name: Checkout Helm Chart
+        uses: actions/checkout@v3
+        with:
+          repository: your-org/minikube-sampleapp
+          path: helm-chart
+          token: ${{ secrets.PAT_GITHUB }}
+
+      - name: Set Env from pipeline.json
+        run: |
+          echo "RELEASE_NAME=$(jq -r .releaseName pipeline.json)" >> $GITHUB_ENV
+          echo "NAMESPACE=$(jq -r .namespace pipeline.json)" >> $GITHUB_ENV
+          echo "VALUES_FILE=$(jq -r .valuesFile pipeline.json)" >> $GITHUB_ENV
+
+      - name: Minikube Update Context
+        run: minikube update-context
+
+      - name: Create Namespace if Not Exists
+        run: |
+          kubectl get ns $NAMESPACE || kubectl create ns $NAMESPACE
+
+      - name: Create Image Pull Secret
+        run: |
+          kubectl create secret docker-registry image-registry-secret \
+            --docker-server=192.168.1.36:5000 \
+            --docker-username=${{ secrets.NEXUS_USERNAME }} \
+            --docker-password=${{ secrets.NEXUS_PASSWORD }} \
+            --docker-email=${{ secrets.DOCKER_EMAIL }} \
+            --namespace=$NAMESPACE \
+            --dry-run=client -o yaml | kubectl apply -f -
+
+      - name: Deploy with Helm
+        run: |
+          helm upgrade --install $RELEASE_NAME ./helm-chart \
+            -n $NAMESPACE \
+            -f $VALUES_FILE
