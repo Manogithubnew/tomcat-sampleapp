@@ -7,12 +7,12 @@ image:
   pullPolicy: IfNotPresent
 
 replicaCount: 1
-containerPort: 8080
+containerPort: 8181
 
 service:
   name: tomcat
   type: NodePort
-  port: 8080
+  port: 8181
   nodePort: 30080
 
 imagePullSecrets:
@@ -21,14 +21,14 @@ imagePullSecrets:
 livenessProbe:
   httpGet:
     path: /
-    port: 8080
+    port: 8181
   initialDelaySeconds: 20
   periodSeconds: 10
 
 readinessProbe:
   httpGet:
     path: /
-    port: 8080
+    port: 8181
   initialDelaySeconds: 15
   periodSeconds: 5
 
