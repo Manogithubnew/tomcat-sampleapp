@@ -12,32 +12,33 @@ jobs:
       IMAGE_NAME: 192.168.1.37:5000/tomcat-sample
 
     steps:
-      - name: Checkout
+      - name: Checkout App Code
         uses: actions/checkout@v3
 
       - name: Login to Nexus Docker Registry
         run: echo "${{ secrets.NEXUS_PASSWORD }}" | docker login 192.168.1.37:5000 -u ${{ secrets.NEXUS_USERNAME }} --password-stdin
 
-      - name: Build Image
+      - name: Build Docker Image
         run: docker build -t $IMAGE_NAME:latest .
 
-      - name: Push Image
+      - name: Push Docker Image
         run: docker push $IMAGE_NAME:latest
 
-      - name: Checkout Helm Chart
+      - name: Checkout Helm Chart Repo
         uses: actions/checkout@v3
         with:
           repository: Manogithubnew/minikube-sampleapp
           path: helm-chart
           token: ${{ secrets.PAT_GITHUB }}
 
-      - name: Set Env from pipeline.json
+      - name: Read pipeline.json
         run: |
+          echo "CHART=$(jq -r .chart pipeline.json)" >> $GITHUB_ENV
+          echo "VALUES_FILE=$(jq -r .valuesFile pipeline.json)" >> $GITHUB_ENV
           echo "RELEASE_NAME=$(jq -r .releaseName pipeline.json)" >> $GITHUB_ENV
           echo "NAMESPACE=$(jq -r .namespace pipeline.json)" >> $GITHUB_ENV
-          echo "VALUES_FILE=$(jq -r .valuesFile pipeline.json)" >> $GITHUB_ENV
 
-      - name: Minikube Update Context
+      - name: Minikube Context Update
         run: minikube update-context
 
       - name: Create Namespace if Not Exists
@@ -45,17 +46,27 @@ jobs:
           kubectl get ns $NAMESPACE || kubectl create ns $NAMESPACE
 
       - name: Create Image Pull Secret
+        env:
+          DOCKER_USERNAME: ${{ secrets.NEXUS_USERNAME }}
+          DOCKER_PASSWORD: ${{ secrets.NEXUS_PASSWORD }}
+          DOCKER_EMAIL: ${{ secrets.DOCKER_EMAIL }}
         run: |
           kubectl create secret docker-registry image-registry-secret \
             --docker-server=192.168.1.36:5000 \
-            --docker-username=${{ secrets.NEXUS_USERNAME }} \
-            --docker-password=${{ secrets.NEXUS_PASSWORD }} \
-            --docker-email=${{ secrets.DOCKER_EMAIL }} \
+            --docker-username=$DOCKER_USERNAME \
+            --docker-password=$DOCKER_PASSWORD \
+            --docker-email=$DOCKER_EMAIL \
             --namespace=$NAMESPACE \
             --dry-run=client -o yaml | kubectl apply -f -
 
-      - name: Deploy with Helm
+      - name: Patch default SA to use pull secret
+        run: |
+          kubectl patch serviceaccount default \
+            -n $NAMESPACE \
+            -p '{"imagePullSecrets":[{"name":"image-registry-secret"}]}' || true
+
+      - name: Deploy using Helm
         run: |
           helm upgrade --install $RELEASE_NAME ./helm-chart \
-            -f $VALUES_FILE \
-            --namespace $NAMESPACE --create-namespace
+            -n $NAMESPACE \
+            -f $VALUES_FILE
