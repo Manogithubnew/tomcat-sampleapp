@@ -21,7 +21,7 @@ jobs:
         run: echo "${{ secrets.NEXUS_PASSWORD }}" | docker login 192.168.1.37:5000 -u ${{ secrets.NEXUS_USERNAME }} --password-stdin
 
       - name: Build Docker Image
-        run: docker build -t $IMAGE_NAME:latest .
+        run: docker build -t $IMAGE_NAME:latest ./tomcat-sampleapp
 
       - name: Push Docker Image
         run: docker push $IMAGE_NAME:latest
@@ -35,10 +35,10 @@ jobs:
 
       - name: Read pipeline.json
         run: |
-          echo "CHART=$(jq -r .chart pipeline.json)" >> $GITHUB_ENV
-          echo "VALUES_FILE=$(jq -r .valuesFile pipeline.json)" >> $GITHUB_ENV
-          echo "RELEASE_NAME=$(jq -r .releaseName pipeline.json)" >> $GITHUB_ENV
-          echo "NAMESPACE=$(jq -r .namespace pipeline.json)" >> $GITHUB_ENV
+          echo "CHART=$(jq -r .chart tomcat-sampleapp/pipeline.json)" >> $GITHUB_ENV
+          echo "VALUES_FILE=tomcat-sampleapp/$(jq -r .valuesFile tomcat-sampleapp/pipeline.json)" >> $GITHUB_ENV
+          echo "RELEASE_NAME=$(jq -r .releaseName tomcat-sampleapp/pipeline.json)" >> $GITHUB_ENV
+          echo "NAMESPACE=$(jq -r .namespace tomcat-sampleapp/pipeline.json)" >> $GITHUB_ENV
 
       - name: Minikube Context Update
         run: minikube update-context
