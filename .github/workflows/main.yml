@@ -14,6 +14,8 @@ jobs:
     steps:
       - name: Checkout App Code
         uses: actions/checkout@v3
+        with:
+          path: tomcat-sampleapp
 
       - name: Login to Nexus Docker Registry
         run: echo "${{ secrets.NEXUS_PASSWORD }}" | docker login 192.168.1.37:5000 -u ${{ secrets.NEXUS_USERNAME }} --password-stdin
