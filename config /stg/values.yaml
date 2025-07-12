@@ -2,7 +2,7 @@
 namespace: tomcat-sample
 
 image:
-  repository: 192.168.1.36:5000/tomcat-sample
+  repository: 192.168.1.37:5000/tomcat-sample
   tag: latest
   pullPolicy: IfNotPresent
 
