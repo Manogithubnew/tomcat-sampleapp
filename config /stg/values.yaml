@@ -1,3 +1,4 @@
+#tomcat-app
 namespace: tomcat-sample
 
 image:
