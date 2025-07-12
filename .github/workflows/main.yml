@@ -56,6 +56,6 @@ jobs:
 
       - name: Deploy with Helm
         run: |
-          helm upgrade --install $RELEASE_NAME ./helm-chart \
-            -n $NAMESPACE \
-            -f $VALUES_FILE
+          helm upgrade --install tomcat-sample ./helm-chart \
+            -f ../tomcat-sampleapp/config/stg/values.yaml \
+            --namespace tomcat-sample --create-namespace
