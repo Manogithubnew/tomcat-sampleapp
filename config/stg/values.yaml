@@ -11,7 +11,7 @@ containerPort: 8080
 
 service:
   name: tomcat
-  type: NodePort
+  type: LoadBalancer
   port: 8080
   nodePort: 30080
 
