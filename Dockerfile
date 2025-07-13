@@ -8,6 +8,6 @@ RUN rm -rf /usr/local/tomcat/webapps/*
 COPY target/sample.war /usr/local/tomcat/webapps/sample.war
 
 # Expose the Tomcat default port
-EXPOSE 8181
+EXPOSE 8080
 
 # CMD is already set to run Tomcat by default
