@@ -22,14 +22,16 @@ livenessProbe:
   httpGet:
     path: /sample
     port: 8080
-  initialDelaySeconds: 20
+  initialDelaySeconds: 40
+  timeoutSeconds: 5
   periodSeconds: 10
 
 readinessProbe:
   httpGet:
     path: /sample
     port: 8080
-  initialDelaySeconds: 15
+  initialDelaySeconds: 30
+  timeoutSeconds: 5
   periodSeconds: 5
 
 resources:
