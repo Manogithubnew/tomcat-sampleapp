@@ -1,6 +1,5 @@
 <web-app xmlns="http://java.sun.com/xml/ns/javaee" version="3.0">
-
-  <!-- Existing HelloServlet -->
+  
   <servlet>
     <servlet-name>HelloServlet</servlet-name>
     <servlet-class>HelloServlet</servlet-class>
@@ -10,7 +9,7 @@
     <url-pattern>/hello</url-pattern>
   </servlet-mapping>
 
-  <!-- 🔐 New LoginServlet -->
+  <!-- ADD THIS -->
   <servlet>
     <servlet-name>LoginServlet</servlet-name>
     <servlet-class>com.example.LoginServlet</servlet-class>
@@ -21,4 +20,3 @@
   </servlet-mapping>
 
 </web-app>
-
