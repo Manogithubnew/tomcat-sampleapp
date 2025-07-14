@@ -22,10 +22,10 @@ jobs:
 
       - name: Build Docker Image
         working-directory: tomcat-sampleapp
-        run: docker build -t $IMAGE_NAME:latest .
+        run: docker build -t $IMAGE_NAME:changeByAutomation  .
 
       - name: Push Docker Image
-        run: docker push $IMAGE_NAME:latest
+        run: docker push $IMAGE_NAME:changeByAutomation 
 
       - name: Checkout Helm Chart Repo
         uses: actions/checkout@v3
