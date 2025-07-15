@@ -4,7 +4,7 @@ namespace: tomcat-sample
 image:
   repository: 192.168.1.37:5000/tomcat-sample
   tag: latest
-  pullPolicy: IfNotPresent
+  pullPolicy: Always
 
 replicaCount: 1
 containerPort: 8080
