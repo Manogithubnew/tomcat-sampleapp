@@ -8,8 +8,10 @@ on:
 jobs:
   build-push-deploy:
     runs-on: self-hosted
+
     env:
       IMAGE_NAME: 192.168.1.37:5000/tomcat-sample
+      IMAGE_TAG: ${{ github.sha }}
 
     steps:
       - name: Checkout App Code
@@ -22,10 +24,10 @@ jobs:
 
       - name: Build Docker Image
         working-directory: tomcat-sampleapp
-        run: docker build -t $IMAGE_NAME:latest .
+        run: docker build -t $IMAGE_NAME:$IMAGE_TAG .
 
       - name: Push Docker Image
-        run: docker push $IMAGE_NAME:latest 
+        run: docker push $IMAGE_NAME:$IMAGE_TAG
 
       - name: Checkout Helm Chart Repo
         uses: actions/checkout@v3
@@ -71,10 +73,11 @@ jobs:
       - name: Confirm values.yaml exists
         run: |
           echo "Looking for file: $VALUES_FILE"
-          ls -l tomcat-sampleapp/config/stg/values.yaml || (echo "Missing values.yaml!" && exit 1)
+          ls -l $VALUES_FILE || (echo "Missing values.yaml!" && exit 1)
 
-      - name: Deploy using Helm
+      - name: Deploy using Helm with SHA image tag
         run: |
           helm upgrade --install $RELEASE_NAME ./helm-chart \
             -n $NAMESPACE \
-            -f tomcat-sampleapp/config/stg/values.yaml
+            -f $VALUES_FILE \
+            --set image.tag=$IMAGE_TAG
